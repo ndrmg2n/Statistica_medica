@@ -94,3 +94,11 @@ r2 <- df[1, 2] / df[3, 2]
 r1 / r2
 ## Odds ratio
 df[1, 1] * df[2, 2] / (df[1, 2] * df[2, 1])
+
+# ESERCIZIO 5B:
+p <- 1
+q <- 2 * 80 / 10750
+df2 <- df
+df2[1, ] <- df[1, ] * p
+df2[2, ] <- round(df[2, ] * q)
+df2[3, ] <- df2[1, ] + df2[2, ]
