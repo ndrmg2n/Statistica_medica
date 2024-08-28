@@ -74,3 +74,23 @@ plot(df[, 2], df[, 4],
     xlab = "Altezza",
     ylab = "Frequenza relativa"
 )
+
+# SONO STATI SALTATI GLI ESERCIZI 3 E 4
+
+# ESERCIZIO 5A:
+df <- data.frame(
+    fumatore <- c(75, 8000, 8075),
+    non_fumatore <- c(5, 2750, 2755),
+    totale <- c(80, 10750, 10830)
+)
+colnames(df) <- c("Fumatori", "Non fumatori", "Totale")
+rownames(df) <- c("Caso", "Controllo", "Totale")
+
+## Rischio fumatori
+r1 <- df[1, 1] / df[3, 1]
+## Rischio non fumatori
+r2 <- df[1, 2] / df[3, 2]
+## Rapporto tra rischi
+r1 / r2
+## Odds ratio
+df[1, 1] * df[2, 2] / (df[1, 2] * df[2, 1])
