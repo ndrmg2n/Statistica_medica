@@ -102,3 +102,53 @@ df2 <- df
 df2[1, ] <- df[1, ] * p
 df2[2, ] <- round(df[2, ] * q)
 df2[3, ] <- df2[1, ] + df2[2, ]
+
+################################################
+
+# ESERCITAZIONE 2 #
+rm(list = ls())
+# ESERCIZIO 1:
+## Malati con variante FV Leiden
+a <- 14
+## Malati senza variante FV Leiden
+b <- 179 - a
+## Sani con variante FV Leiden
+c <- 42
+## Sani senza variante FV Leiden
+d <- 763 - 42
+## Matrice dei dati
+mx <- matrix(data = c(a, b, c, d), nrow = 2, byrow = T)
+rownames(mx) <- c("Malato", "Sano")
+colnames(mx) <- c("Con variante", "Senza variante")
+colSums(mx)
+rowSums(mx)
+
+## Funzione per inferenza statistica
+OR <- function(a, b, c, d) {
+    OR <- (a * d) / (b * c)
+    se <- sqrt(1 / a + 1 / b + 1 / c + 1 / d)
+    z <- (log(OR) - log(1)) / se
+    p <- 2 * (1 - pnorm(abs(z)))
+
+    lo <- exp(log(OR) - 1.96 * se)
+    up <- exp(log(OR) + 1.96 * se)
+
+    cat("Odds Ratio =", OR, "\n")
+    cat("SE[log(OR)] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI OR = (", lo, "to", up, ")\n")
+}
+OR(a, b, c, d)
+
+## Malati con variante G202110A
+a2 <- 5
+## Malati senza variante G202110A
+b2 <- 188 - a2
+## Sani con variante G202110A
+c2 <- 18
+## Sani senza variante G202110A
+d2 <- 763 - c2
+
+OR(a2, b2, c2, d2)
