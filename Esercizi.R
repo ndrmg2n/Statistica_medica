@@ -23,3 +23,16 @@ var(y)
 sd(y)
 ## Coefficiente di variazione
 sd(y) / mean(y)
+
+# ESERCIZIO 1B:
+## Quartili, min, max e media
+summary(y)
+## Diagramma quantile
+plot(sort(y), ((1:10) - 0.5) / n,
+    xlab = "Decessi", ylab = "Rango relativo",
+    main = "Diagramma quantile dei decessi",
+    type = "b"
+)
+## Quartili e centili
+quantile(y)
+quantile(y, probs = seq(0, 1, 0.01))
