@@ -320,9 +320,43 @@ rr <- function(y1, y0, M1, M0) {
 
 rr(y1, y0, M1, M0)
 
-## Rate ratio tra utilizzanti di steroidi inalati e orali 
+## Rate ratio tra utilizzanti di steroidi inalati e orali
 y1 <- 5
 y0 <- 14
 M1 <- 3269
 M0 <- 3133
 rr(y1, y0, M1, M0)
+
+# ESERCIZIO 6:
+## Esito negativo prima e dopo il trattamento
+e <- 7
+## Esito positivo prima e negativo dopo il trattamento
+f <- 5
+## Esito negativo prima e positivo dopo il trattamento
+g <- 15
+## Esito positivo prima e dopo il trattamento
+h <- 5
+mx <- matrix(c(e, f, g, h), nrow = 2, byrow = T)
+colnames(mx) <- c("Prima -", "Prima +")
+rownames(mx) <- c("Dopo -", "Dopo +")
+
+RDa <- function(e, f, g, h) {
+    n <- e + f + g + h
+    R1 <- (e + f) / n
+    R0 <- (e + g) / n
+    RD <- R1 - R0
+    se <- sqrt((f + g) / n^2)
+    z <- (RD - 0) / se
+    p <- 2 * (1 - pnorm(abs(z)))
+
+    lo <- RD - 1.96 * se
+    up <- RD + 1.96 * se
+
+    cat("Risk Difference =", RD, "\n")
+    cat("SE[RD] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI RD = (", lo, "to", up, ")\n")
+}
+RDa(e, f, g, h)
