@@ -152,3 +152,52 @@ c2 <- 18
 d2 <- 763 - c2
 
 OR(a2, b2, c2, d2)
+
+# ESERCIZIO 2:
+rm(list = ls())
+## Malati esposti al metilprendisolone (dose elevata)
+y1 <- 7
+## Malati non esposti al metilprendisolone (dose standard)
+y0 <- 13
+## Numero non esposti
+n0 <- 30
+## Numero esposti
+n1 <- 30
+
+mx <- matrix(c(y1, y0, n1 - y1, n0 - y0), nrow = 2, byrow = T)
+rownames(mx) <- c("Malati", "Sani")
+colnames(mx) <- c("Esposti", "Non esposti")
+
+RD <- function(y1, y0, n1, n0) {
+    R1 <- y1 / n1
+    R0 <- y0 / n0
+    RD <- R1 - R0
+    se <- sqrt((R1 * (1 - R1)) / n1 + (R0 * (1 - R0)) / n0)
+    z <- (RD - 0) / se
+    p <- 2 * (1 - pnorm(abs(z)))
+
+    lo <- RD - 1.96 * se
+    up <- RD + 1.96 * se
+
+    cat("Risk Difference =", RD, "\n")
+    cat("SE[RD] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI OR = (", lo, "to", up, ")\n")
+}
+RD(y1, y0, n1, n0)
+
+## Malati esposti al metilprendisolone reimmessi al giorno 23 (dose elevata)
+y1 <- 7
+## Malati non esposti al metilprendisolone reimmessi al giorno 23 (dose standard)
+y0 <- 16
+
+RD(y1, y0, n1, n0)
+
+## Malati esposti al metilprendisolone morti (dose elevata)
+y1 <- 1
+## Malati non esposti al metilprendisolone morti (dose standard)
+y0 <- 4
+
+RD(y1, y0, n1, n0)
