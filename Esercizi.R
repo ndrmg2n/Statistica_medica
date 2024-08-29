@@ -102,3 +102,261 @@ df2 <- df
 df2[1, ] <- df[1, ] * p
 df2[2, ] <- round(df[2, ] * q)
 df2[3, ] <- df2[1, ] + df2[2, ]
+
+################################################
+
+# ESERCITAZIONE 2 #
+rm(list = ls())
+# ESERCIZIO 1:
+## Malati con variante FV Leiden
+a <- 14
+## Malati senza variante FV Leiden
+b <- 179 - a
+## Sani con variante FV Leiden
+c <- 42
+## Sani senza variante FV Leiden
+d <- 763 - 42
+## Matrice dei dati
+mx <- matrix(data = c(a, b, c, d), nrow = 2, byrow = T)
+rownames(mx) <- c("Malato", "Sano")
+colnames(mx) <- c("Con variante", "Senza variante")
+colSums(mx)
+rowSums(mx)
+
+## Funzione per inferenza statistica
+OR <- function(a, b, c, d) {
+    OR <- (a * d) / (b * c)
+    se <- sqrt(1 / a + 1 / b + 1 / c + 1 / d)
+    z <- (log(OR) - log(1)) / se
+    p <- 2 * (1 - pnorm(abs(z)))
+
+    lo <- exp(log(OR) - 1.96 * se)
+    up <- exp(log(OR) + 1.96 * se)
+
+    cat("Odds Ratio =", OR, "\n")
+    cat("SE[log(OR)] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI OR = (", lo, "to", up, ")\n")
+}
+OR(a, b, c, d)
+
+## Malati con variante G202110A
+a2 <- 5
+## Malati senza variante G202110A
+b2 <- 188 - a2
+## Sani con variante G202110A
+c2 <- 18
+## Sani senza variante G202110A
+d2 <- 763 - c2
+
+OR(a2, b2, c2, d2)
+
+# ESERCIZIO 2:
+rm(list = ls())
+## Malati esposti al metilprendisolone (dose elevata)
+y1 <- 7
+## Malati non esposti al metilprendisolone (dose standard)
+y0 <- 13
+## Numero non esposti
+n0 <- 30
+## Numero esposti
+n1 <- 30
+
+mx <- matrix(c(y1, y0, n1 - y1, n0 - y0), nrow = 2, byrow = T)
+rownames(mx) <- c("Malati", "Sani")
+colnames(mx) <- c("Esposti", "Non esposti")
+
+RD <- function(y1, y0, n1, n0) {
+    R1 <- y1 / n1
+    R0 <- y0 / n0
+    RD <- R1 - R0
+    se <- sqrt((R1 * (1 - R1)) / n1 + (R0 * (1 - R0)) / n0)
+    z <- (RD - 0) / se
+    p <- 2 * (1 - pnorm(abs(z)))
+
+    lo <- RD - 1.96 * se
+    up <- RD + 1.96 * se
+
+    cat("Risk Difference =", RD, "\n")
+    cat("SE[RD] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI RD = (", lo, "to", up, ")\n")
+}
+RD(y1, y0, n1, n0)
+
+## Malati esposti al metilprendisolone reimmessi al giorno 23 (dose elevata)
+y1 <- 7
+## Malati non esposti al metilprendisolone reimmessi al giorno 23 (dose standard)
+y0 <- 16
+
+RD(y1, y0, n1, n0)
+
+## Malati esposti al metilprendisolone morti (dose elevata)
+y1 <- 1
+## Malati non esposti al metilprendisolone morti (dose standard)
+y0 <- 4
+
+RD(y1, y0, n1, n0)
+
+# ESERCIZIO 3:
+rm(list = ls())
+df <- data.frame(
+    Dilatazione <- c(3.7, 3.9, 2.8, 4.1, 3.4, 4.0, 4.3, 3.6, 4.6, 4.0), # dilatazione utero durante il parto (in cm)
+    Trattamento <- c(rep("P", 5), rep("F, 5")) # trattamento o meno ad un farmaco per facilitare la dilatazione
+)
+colnames(df) <- c("Dilatazione (cm)", "Trattamento")
+df
+
+y1 <- df[, 1][df[, 2] == "F"]
+y0 <- df[, 1][df[, 2] == "P"]
+
+## Funzione per test-z di una differenza fra medie
+MD <- function(y1, y0, type) { # type è una variabile che è "1-group" nel caso di campioni appaiati e "2-group" nel caso di campioni indipendenti
+    n1 <- length(y1)
+    n0 <- length(y0)
+    m1 <- mean(y1)
+    m0 <- mean(y0)
+
+    if (type == "2-group") {
+        s1 <- var(y1)
+        s0 <- var(y0)
+        sp <- ((n1 - 1) * s1 + (n0 - 1) * s0) / (n1 + n0 - 2)
+    } else {
+        sp <- var(y1 - y0) / 2
+    }
+
+    MD <- m1 - m0
+    se <- sqrt(sp * (1 / n1 + 1 / n0))
+    z <- (MD - 0) / se
+    p <- 2 * (1 - pnorm(abs(z)))
+
+    lo <- MD - 1.96 * se
+    up <- MD + 1.96 * se
+
+    cat("Mean Difference =", MD, "\n")
+    cat("SE[MD] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI MD = (", lo, "to", up, ")\n")
+}
+
+MD(y1, y0, type = "2-group")
+
+# ESERCIZIO 4:
+rm(list = ls())
+
+y0 <- c(39, 24, 14, 31, 26, 28, 44, 29, 29, 30) # piastrine pre trattamento
+y1 <- c(44, 35, 20, 28, 23, 39, 47, 37, 30, 30) # piastrine post trattamento
+
+## Funzione per test-z di una differenza fra medie
+MD <- function(y1, y0, type) {
+    n1 <- length(y1)
+    n0 <- length(y0)
+    m1 <- mean(y1)
+    m0 <- mean(y0)
+
+    if (type == "2-group") {
+        s1 <- var(y1)
+        s0 <- var(y0)
+        sp <- ((n1 - 1) * s1 + (n0 - 1) * s0) / (n1 + n0 - 2)
+    } else {
+        sp <- var(y1 - y0) / 2
+    }
+
+    MD <- m1 - m0
+    se <- sqrt(sp * (1 / n1 + 1 / n0))
+    z <- (MD - 0) / se
+    p <- 2 * (1 - pnorm(abs(z)))
+
+    lo <- MD - 1.96 * se
+    up <- MD + 1.96 * se
+
+    cat("Mean Difference =", MD, "\n")
+    cat("SE[MD] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI MD = (", lo, "to", up, ")\n")
+}
+
+MD(y1, y0, type = "1-group")
+
+# ESERCIZIO 5:
+rm(list = ls())
+
+# y: casi di varicella
+# M: # massa degli utilizzatori (persone-anno)
+y1 <- 5 + 14 # casi di varicella tra chi usa steroidi
+y0 <- 252 # casi di varicella tra chi non usa steroidi
+M1 <- 3269 + 3133
+M0 <- 136272
+mx <- matrix(c(y1, y0, M1, M0), nrow = 2, byrow = T)
+rownames(mx) <- c("Casi di varicella", "Persone-anno")
+colnames(mx) <- c("Uso steroidi", "Non uso steroidi")
+
+rr <- function(y1, y0, M1, M0) {
+    r1 <- y1 / M1
+    r0 <- y0 / M0
+    rr <- r1 / r0
+    se <- sqrt(1 / y1 + 1 / y0)
+    z <- (log(rr) - log(1)) / se
+    p <- 2 * (1 - pnorm(abs(z)))
+
+    lo <- exp(log(rr) - 1.96 * se)
+    up <- exp(log(rr) + 1.96 * se)
+
+    cat("rate ratio =", rr, "\n")
+    cat("SE[rr] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI rr = (", lo, "to", up, ")\n")
+}
+
+rr(y1, y0, M1, M0)
+
+## Rate ratio tra utilizzanti di steroidi inalati e orali
+y1 <- 5
+y0 <- 14
+M1 <- 3269
+M0 <- 3133
+rr(y1, y0, M1, M0)
+
+# ESERCIZIO 6:
+## Esito negativo prima e dopo il trattamento
+e <- 7
+## Esito positivo prima e negativo dopo il trattamento
+f <- 5
+## Esito negativo prima e positivo dopo il trattamento
+g <- 15
+## Esito positivo prima e dopo il trattamento
+h <- 5
+mx <- matrix(c(e, f, g, h), nrow = 2, byrow = T)
+colnames(mx) <- c("Prima -", "Prima +")
+rownames(mx) <- c("Dopo -", "Dopo +")
+
+RDa <- function(e, f, g, h) {
+    n <- e + f + g + h
+    R1 <- (e + f) / n
+    R0 <- (e + g) / n
+    RD <- R1 - R0
+    se <- sqrt((f + g) / n^2)
+    z <- (RD - 0) / se
+    p <- 2 * (1 - pnorm(abs(z)))
+
+    lo <- RD - 1.96 * se
+    up <- RD + 1.96 * se
+
+    cat("Risk Difference =", RD, "\n")
+    cat("SE[RD] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI RD = (", lo, "to", up, ")\n")
+}
+RDa(e, f, g, h)
