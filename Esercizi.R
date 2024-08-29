@@ -203,6 +203,7 @@ y0 <- 4
 RD(y1, y0, n1, n0)
 
 # ESERCIZIO 3:
+rm(list=ls())
 df <- data.frame(
     Dilatazione <- c(3.7, 3.9, 2.8, 4.1, 3.4, 4.0, 4.3, 3.6, 4.6, 4.0),
     Trattamento <- c(rep("P", 5), rep("F, 5"))
@@ -247,3 +248,42 @@ MD <- function(y1, y0, type) { # type è una variabile che è "1-group" nel caso
 
 MD(y1, y0, type = "2-group")
 
+# ESERCIZIO 4:
+rm(list=ls())
+
+y0 <- c(39, 24, 14, 31, 26, 28, 44, 29, 29, 30)
+y1 <- c(44, 35, 20, 28, 23, 39, 47, 37, 30, 30)
+
+## Funzione per test-z di una differenza fra medie
+MD <- function(y1, y0, type) {
+    n1 <- length(y1)
+    n0 <- length(y0)
+    m1 <- mean(y1)
+    m0 <- mean(y0)
+
+    if (type == "2-group") {
+        s1 <- var(y1)
+        s0 <- var(y0)
+        sp <- ((n1 - 1) * s1 + (n0 - 1) * s0) / (n1 + n0 - 2)
+    }
+    else {
+        sp <- var(y1 - y0) / 2
+    }
+
+    MD <- m1 - m0
+    se <- sqrt(sp * (1 / n1 + 1 / n0))
+    z <- (MD-0)/se
+    p <- 2*(1-pnorm(abs(z)))
+
+    lo <- MD - 1.96 * se
+    up <- MD + 1.96 * se
+
+    cat("Mean Difference =", MD, "\n")
+    cat("SE[MD] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI MD = (", lo, "to", up, ")\n")
+}
+
+MD(y1, y0, type = "1-group")
