@@ -203,10 +203,10 @@ y0 <- 4
 RD(y1, y0, n1, n0)
 
 # ESERCIZIO 3:
-rm(list=ls())
+rm(list = ls())
 df <- data.frame(
-    Dilatazione <- c(3.7, 3.9, 2.8, 4.1, 3.4, 4.0, 4.3, 3.6, 4.6, 4.0),
-    Trattamento <- c(rep("P", 5), rep("F, 5"))
+    Dilatazione <- c(3.7, 3.9, 2.8, 4.1, 3.4, 4.0, 4.3, 3.6, 4.6, 4.0), # dilatazione utero durante il parto (in cm)
+    Trattamento <- c(rep("P", 5), rep("F, 5")) # trattamento o meno ad un farmaco per facilitare la dilatazione
 )
 colnames(df) <- c("Dilatazione (cm)", "Trattamento")
 df
@@ -225,15 +225,14 @@ MD <- function(y1, y0, type) { # type è una variabile che è "1-group" nel caso
         s1 <- var(y1)
         s0 <- var(y0)
         sp <- ((n1 - 1) * s1 + (n0 - 1) * s0) / (n1 + n0 - 2)
-    }
-    else {
+    } else {
         sp <- var(y1 - y0) / 2
     }
 
     MD <- m1 - m0
     se <- sqrt(sp * (1 / n1 + 1 / n0))
-    z <- (MD-0)/se
-    p <- 2*(1-pnorm(abs(z)))
+    z <- (MD - 0) / se
+    p <- 2 * (1 - pnorm(abs(z)))
 
     lo <- MD - 1.96 * se
     up <- MD + 1.96 * se
@@ -249,10 +248,10 @@ MD <- function(y1, y0, type) { # type è una variabile che è "1-group" nel caso
 MD(y1, y0, type = "2-group")
 
 # ESERCIZIO 4:
-rm(list=ls())
+rm(list = ls())
 
-y0 <- c(39, 24, 14, 31, 26, 28, 44, 29, 29, 30)
-y1 <- c(44, 35, 20, 28, 23, 39, 47, 37, 30, 30)
+y0 <- c(39, 24, 14, 31, 26, 28, 44, 29, 29, 30) # piastrine pre trattamento
+y1 <- c(44, 35, 20, 28, 23, 39, 47, 37, 30, 30) # piastrine post trattamento
 
 ## Funzione per test-z di una differenza fra medie
 MD <- function(y1, y0, type) {
@@ -265,15 +264,14 @@ MD <- function(y1, y0, type) {
         s1 <- var(y1)
         s0 <- var(y0)
         sp <- ((n1 - 1) * s1 + (n0 - 1) * s0) / (n1 + n0 - 2)
-    }
-    else {
+    } else {
         sp <- var(y1 - y0) / 2
     }
 
     MD <- m1 - m0
     se <- sqrt(sp * (1 / n1 + 1 / n0))
-    z <- (MD-0)/se
-    p <- 2*(1-pnorm(abs(z)))
+    z <- (MD - 0) / se
+    p <- 2 * (1 - pnorm(abs(z)))
 
     lo <- MD - 1.96 * se
     up <- MD + 1.96 * se
@@ -287,3 +285,44 @@ MD <- function(y1, y0, type) {
 }
 
 MD(y1, y0, type = "1-group")
+
+# ESERCIZIO 5:
+rm(list = ls())
+
+# y: casi di varicella
+# M: # massa degli utilizzatori (persone-anno)
+y1 <- 5 + 14 # casi di varicella tra chi usa steroidi
+y0 <- 252 # casi di varicella tra chi non usa steroidi
+M1 <- 3269 + 3133
+M0 <- 136272
+mx <- matrix(c(y1, y0, M1, M0), nrow = 2, byrow = T)
+rownames(mx) <- c("Casi di varicella", "Persone-anno")
+colnames(mx) <- c("Uso steroidi", "Non uso steroidi")
+
+rr <- function(y1, y0, M1, M0) {
+    r1 <- y1 / M1
+    r0 <- y0 / M0
+    rr <- r1 / r0
+    se <- sqrt(1 / y1 + 1 / y0)
+    z <- (log(rr) - log(1)) / se
+    p <- 2 * (1 - pnorm(abs(z)))
+
+    lo <- exp(log(rr) - 1.96 * se)
+    up <- exp(log(rr) + 1.96 * se)
+
+    cat("rate ratio =", rr, "\n")
+    cat("SE[rr] =", se, "\n")
+    cat("z-test =", z, "\n")
+    cat("P(Z-sided) =", p, "\n")
+
+    cat("95%CI rr = (", lo, "to", up, ")\n")
+}
+
+rr(y1, y0, M1, M0)
+
+## Rate ratio tra utilizzanti di steroidi inalati e orali 
+y1 <- 5
+y0 <- 14
+M1 <- 3269
+M0 <- 3133
+rr(y1, y0, M1, M0)
