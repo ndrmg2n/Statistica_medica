@@ -446,8 +446,27 @@ dati2_[, 7] <- as.factor(dati2[, 7])
 dati2_[, 8] <- as.factor(dati2[, 8])
 dati2_[, 9] <- as.factor(dati2[, 9])
 
-formula <- reformulate(c("GS",colnames(dati2_)[c(3:9)]), colnames(dati2_)[2])
+formula <- reformulate(c("GS", colnames(dati2_)[c(3:9)]), colnames(dati2_)[2])
 
 M1 <- glm(formula, data = dati2_, family = binomial(link = "logit"))
 summary(M1)
 exp(summary(M1)$coefficients[, 1])
+
+# ESERCIZIO 3:
+rm(list = ls())
+
+dati3 <- read.csv2("pfo.csv", header = T, sep = ",")
+dati3[, c(4:9, 11)] <- dati3[, c(4:9, 11)] - 1
+
+t <- dati3$follow_up_time
+d <- dati3$recurrences
+x <- as.factor(dati3$PFO)
+
+## Stima del rischio istantaneo col metodo Kaplan-Meier
+install.packages("survival")
+library(survival)
+surv_obj <- Surv(t, d)
+KM <- survfit(surv_obj ~ x)
+plot(surv_obj)
+
+## Fine esercizio perché non va la funzione "survfit"
