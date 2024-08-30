@@ -360,3 +360,113 @@ RDa <- function(e, f, g, h) {
     cat("95%CI RD = (", lo, "to", up, ")\n")
 }
 RDa(e, f, g, h)
+
+################################################
+
+# ESERCITAZIONE 3 #
+rm(list = ls())
+# ESERCIZIO 1:
+install.packages("mefa")
+library(mefa)
+
+dati1 <- read.csv2("diet.csv", header = T, sep = ",")
+colnames(dati1) <- c("carbohydrate", colnames(dati1)[-1])
+summary(dati1)
+## Variabile dipendente
+y <- dati1$carbohydrate
+## Regressori
+x1 <- dati1$age
+x2 <- dati1$weight
+x3 <- dati1$protein
+x4 <- dati1$regime - 1
+
+formula <- reformulate(colnames(dati1)[-1], colnames(dati1)[1])
+fit1 <- lm(formula, data = dati1)
+summary(fit1)
+
+confint.default(fit1)
+
+# ESERCIZIO 2:
+dati2 <- read.csv("stroke_in_young.csv", header = T, sep = ",")
+colnames(dati2)[1] <- "id"
+summary(dati2)
+
+## Modello A
+dati2_ <- dati2
+dati2_[, 10] <- as.factor(dati2[, 10])
+dati2_[, 11] <- as.factor(dati2[, 11])
+dati2_[, 12] <- as.factor(dati2[, 12])
+dati2_[, 13] <- as.factor(dati2[, 13])
+formula <- reformulate(colnames(dati2_)[10:13], colnames(dati2_)[2])
+
+y <- dati2$cc
+x.fattore5 <- as.factor(dati2$v)
+x.fattore2 <- as.factor(dati2$ii)
+x.mthfr <- as.factor(dati2$mthfr)
+x.apoe <- as.factor(dati2$apoe)
+
+M1 <- glm(formula, data = dati2_, family = binomial(link = "logit"))
+summary(M1)
+exp(summary(M1)$coefficients[, 1])
+
+## Modello B
+dati2_[, 10] <- as.numeric(dati2[, 10])
+dati2_[, 11] <- as.numeric(dati2[, 11])
+dati2_[, 12] <- as.numeric(dati2[, 12])
+dati2_[, 13] <- as.numeric(dati2[, 13])
+formula <- reformulate(colnames(dati2_)[10:13], colnames(dati2_)[2])
+
+M1 <- glm(formula, data = dati2_, family = binomial(link = "logit"))
+summary(M1)
+exp(summary(M1)$coefficients[, 1])
+
+## Modello C
+dati2_[, 10] <- 1 * (dati2[, 10] > 1)
+dati2_[, 11] <- 1 * (dati2[, 11] > 1)
+dati2_[, 12] <- 1 * (dati2[, 12] > 2)
+dati2_[, 13] <- 1 * (dati2[, 13] > 1)
+formula <- reformulate(colnames(dati2_)[10:13], colnames(dati2_)[2])
+
+M1 <- glm(formula, data = dati2_, family = binomial(link = "logit"))
+summary(M1)
+exp(summary(M1)$coefficients[, 1])
+
+## Modello D
+GS <- dati2_[, 10] + dati2_[, 11] + dati2_[, 12] + dati2_[, 13] # numero di varianti a rischio (es. 1 = una variante a rischio)
+formula <- reformulate("GS", colnames(dati2_)[2])
+
+M1 <- glm(formula, data = dati2_, family = binomial(link = "logit"))
+summary(M1)
+exp(summary(M1)$coefficients[, 1])
+
+## Modello E
+dati2_[, 3] <- as.factor(dati2[, 3])
+dati2_[, 6] <- as.factor(dati2[, 6])
+dati2_[, 7] <- as.factor(dati2[, 7])
+dati2_[, 8] <- as.factor(dati2[, 8])
+dati2_[, 9] <- as.factor(dati2[, 9])
+
+formula <- reformulate(c("GS", colnames(dati2_)[c(3:9)]), colnames(dati2_)[2])
+
+M1 <- glm(formula, data = dati2_, family = binomial(link = "logit"))
+summary(M1)
+exp(summary(M1)$coefficients[, 1])
+
+# ESERCIZIO 3:
+rm(list = ls())
+
+dati3 <- read.csv2("pfo.csv", header = T, sep = ",")
+dati3[, c(4:9, 11)] <- dati3[, c(4:9, 11)] - 1
+
+t <- dati3$follow_up_time
+d <- dati3$recurrences
+x <- as.factor(dati3$PFO)
+
+## Stima del rischio istantaneo col metodo Kaplan-Meier
+install.packages("survival")
+library(survival)
+surv_obj <- Surv(t, d)
+KM <- survfit(surv_obj ~ x)
+plot(surv_obj)
+
+## Fine esercizio perché non va la funzione "survfit"
