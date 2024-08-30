@@ -360,3 +360,28 @@ RDa <- function(e, f, g, h) {
     cat("95%CI RD = (", lo, "to", up, ")\n")
 }
 RDa(e, f, g, h)
+
+################################################
+
+# ESERCITAZIONE 3 #
+rm(list = ls())
+# ESERCIZIO 1:
+install.packages("mefa")
+library(mefa)
+
+dati1 <- read.csv2("diet.csv", header = T, sep = ",")
+colnames(dati1) <- c("carbohydrate", colnames(dati1)[-1])
+summary(dati1)
+## Variabile dipendente
+y <- dati1$carbohydrate
+## Regressori
+x1 <- dati1$age
+x2 <- dati1$weight
+x3 <- dati1$protein
+x4 <- dati1$regime - 1
+
+formula <- reformulate(colnames(dati1)[-1], colnames(dati1)[1])
+fit1 <- lm(formula, data = dati1)
+summary(fit1)
+
+confint.default(fit1)
