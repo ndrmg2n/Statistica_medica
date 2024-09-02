@@ -470,3 +470,74 @@ KM <- survfit(surv_obj ~ x)
 plot(surv_obj)
 
 ## Fine esercizio perché non va la funzione "survfit"
+
+# ESERCITAZIONE 4 #
+rm(list = ls())
+source("functions.R")
+# ESERCIZIO 1:
+mx <- matrix(c(1, 1, 1, 6, 1, 1, 0, 30, 1, 0, 1, 8, 1, 0, 0, 19, 0, 1, 1, 4, 0, 1, 0, 20, 0, 0, 1, 9, 0, 0, 0, 24), byrow = T, ncol = 4)
+colnames(mx) <- c("z", "x", "y", "count")
+## X: alcolista / non alcolista
+## Z: fumo / non fumo
+## Y: tumore alla bocca / non tumore alla bocca
+
+
+# Z X    | Y+| Y-
+#-------|---|---
+# Z+X+   | 6 | 30          "+" = 1   "-" = 0
+# Z+X-   | 8 | 19
+# Z-X+   | 4 | 20
+# Z-X-   | 9 | 24
+
+## Valutazione del confodimento
+## Step 1: valutazione dell'associazione tra X ed Y
+
+#    | X+| X-
+# ---|---|---
+#  Y+| 10| 17
+#  Y-| 50| 43
+
+## Malati (y = 1) alcolisti (x = 1) ## Casi esposti
+y1 <- 10
+## Malati non alcolisti (y = 1, x = 0) ## Casi non esposti
+y0 <- 17
+## Totale esposti
+n1 <- 10 + 50
+## Totale non esposti
+n0 <- 17 + 43
+
+RR(y1, y0, n1, n0)
+
+## Step 2: valutazione dell'associazione tra X e Z
+
+#    | X+| X-
+# ---|---|---
+#  Z+| 36| 27
+#  Z-| 24| 33
+
+## Alcolisti (x = 1) fumatori (z = 1) ## Casi esposti
+y1 <- 36
+## Alcolisti non fumatori (x = 1, z = 0) ## Casi non esposti
+y0 <- 24
+## Totale esposti
+n1 <- 36 + 27
+## Totale non esposti
+n0 <- 24 + 33
+
+RR(y1, y0, n1, n0)
+
+## Step 3: valutazione dell'effetto di X e Z su Y
+library(mefa)
+
+z <- mx[, 1]
+x <- mx[, 2]
+y <- mx[, 3]
+count <- mx[, 4]
+
+df <- rep(data.frame(z, x, y), times = count)
+
+formula <- reformulate(colnames(df)[1:2], colnames(df)[3])
+fit1 <- glm(formula, data = df, family = binomial(link = "log"))
+summary(fit1)
+exp(summary(fit1)$coefficients)
+exp(confint.default(fit1))
