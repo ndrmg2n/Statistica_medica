@@ -515,9 +515,9 @@ RR(y1, y0, n1, n0)
 #  Z+| 36| 27
 #  Z-| 24| 33
 
-## Alcolisti (x = 1) fumatori (z = 1) ## Casi esposti
+## Alcolisti (x = 1) fumatori (z = 1)
 y1 <- 36
-## Alcolisti non fumatori (x = 1, z = 0) ## Casi non esposti
+## Alcolisti non fumatori (x = 1, z = 0)
 y0 <- 24
 ## Totale esposti
 n1 <- 36 + 27
@@ -541,3 +541,66 @@ fit1 <- glm(formula, data = df, family = binomial(link = "log"))
 summary(fit1)
 exp(summary(fit1)$coefficients)
 exp(confint.default(fit1))
+
+# ESERCIZIO 2:
+rm(list = ls())
+source("functions.R")
+
+# Z X    | Y+| Y-
+# -------|---|---
+# Z+X+   | 48| 14          "+" = 1   "-" = 0
+# Z+X-   | 39| 78
+# Z-X+   | 77| 38
+# Z-X-   | 78|105
+
+## X: allele e4 di APOE
+## Z: allele T di TNF-a
+## Y: alzheimer
+
+## Valutazione della moderazione
+## Step 1: valutazione dell'associazione tra X ed Y
+
+#    | X+| X-
+# ---|---|---
+#  Y+|125|117
+#  Y-| 52|183
+
+## Malati (y = 1) con l'allele e4 di APOE (x = 1) ## Casi esposti
+a <- 125
+## Malati senza l'allele e4 di APOE (y = 1, x = 0) ## Casi non esposti
+b <- 117
+## Sani esposti
+c <- 52
+## Sani non esposti
+d <- 183
+
+OR(a, b, c, d)
+
+## Step 2: valutazione dell'associazione tra X ed Z
+
+#    | Z+| Z-
+# ---|---|---
+#  X+| 62|115
+#  X-|117|183
+
+## Allele e4 di APOE (x = 1) con l'allele T di TNF-a (z = 1)
+a <- 62
+## Allele e4 di APOE senza l'allele T di TNF-a (x = 1, z = 0)
+b <- 115
+## Senza allele e4 di APOE con l'allele T di TNF-a
+c <- 117
+## Senza allele e4 di APOE e l'allele T di TNF-a
+d <- 183
+
+OR(a, b, c, d)
+
+## Step 3: valutazione dell'effetto di X e Z su Y
+z <- c(rep(1, 4), rep(0, 4))
+x <- c(rep(c(1, 1, 0, 0), 2))
+y <- c(rep(c(1, 0), 4))
+count <- c(48, 13, 39, 78, 77, 38, 78, 105)
+df <- rep(data.frame(z, x, y), times = count)
+
+formula <- reformulate(c(colnames(df)[1:2], "x:z"), colnames(df)[3])
+fit1 <- glm(formula, data = df, family = binomial(link = "logit"))
+summary(fit1)
